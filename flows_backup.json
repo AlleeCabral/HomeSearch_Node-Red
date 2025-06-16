@@ -1,0 +1,927 @@
+[
+    {
+        "id": "d0aa877c69268acf",
+        "type": "tab",
+        "label": "Flow 1",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "8de2ee7b9a7ab0c8",
+        "type": "telegram bot",
+        "botname": "mudanssa_bot",
+        "usernames": "",
+        "chatids": "-1002546713175,672048596",
+        "baseapiurl": "",
+        "testenvironment": false,
+        "updatemode": "polling",
+        "pollinterval": "300",
+        "usesocks": false,
+        "sockshost": "",
+        "socksprotocol": "socks5",
+        "socksport": "6667",
+        "socksusername": "anonymous",
+        "sockspassword": "",
+        "bothost": "",
+        "botpath": "",
+        "localbothost": "0.0.0.0",
+        "localbotport": "8443",
+        "publicbotport": "8443",
+        "privatekey": "",
+        "certificate": "",
+        "useselfsignedcertificate": false,
+        "sslterminated": false,
+        "verboselogging": false
+    },
+    {
+        "id": "0a54eaefa4e4f527",
+        "type": "telegrambot-config",
+        "botname": "mudanssa_bot",
+        "usernames": "",
+        "chatIds": "-1002546713175",
+        "pollInterval": 300
+    },
+    {
+        "id": "9e7247b8197f2e66",
+        "type": "split",
+        "z": "d0aa877c69268acf",
+        "name": "",
+        "splt": "\\n",
+        "spltType": "str",
+        "arraySplt": 1,
+        "arraySpltType": "len",
+        "stream": false,
+        "addname": "",
+        "property": "payload",
+        "x": 770,
+        "y": 660,
+        "wires": [
+            [
+                "0e7b3b71b7f2042f"
+            ]
+        ]
+    },
+    {
+        "id": "d105c98604d053a7",
+        "type": "function",
+        "z": "d0aa877c69268acf",
+        "name": "Format Telegram Msg",
+        "func": "// Get the list of previously sent apartment links from flow context\nlet sentApartments = flow.get('sentApartments') || [];\n\n// Initialize an array to store the formatted messages\nlet formattedMessages = [];\n\n// Initialize an array to store the links of new apartments\nlet newApartments = [];\n\n// Iterate over each apartment in the combined data\nmsg.payload.forEach(apartment => {\n    let apartmentDetails = apartment.apartmentDetails;\n    let link = apartment.link;\n\n    // Check if the apartment has been sent before (based on its link)\n    if (!sentApartments.includes(link)) {\n        // If not sent before, mark it as new and add it to newApartments\n        newApartments.push(link);\n\n        // Extract the address (the part after the \"|\")\n        let parts = apartmentDetails.split('|');\n        let address = parts.length > 1 ? parts[1].trim() : \"Unknown location\"; // Get the address after the \"|\"\n\n        // Create a Google Maps link based on the address\n        let googleMapsLink = `https://www.google.com/maps?q=${encodeURIComponent(address)}`;\n\n        // Format the message for Telegram\n        let message = `Apartment Details: ${apartmentDetails}\\n\\n` +\n            `More Info: [Click here](${link})\\n` + // The apartment link\n            `View on Google Maps: [Google Maps](${googleMapsLink})`; // Google Maps link\n\n        // Add the formatted message to the array\n        formattedMessages.push({\n            chatId: \"672048596\",  // Replace with your actual Telegram chat ID\n            type: \"message\",\n            content: message,\n            options: {\n                parse_mode: \"Markdown\"\n            }\n        });\n    }\n});\n\n// If there are any new apartments, proceed with sending them to Telegram\nif (formattedMessages.length > 0) {\n    // Update the list of sent apartments by adding the new apartments\n    sentApartments = [...sentApartments, ...newApartments];\n    flow.set('sentApartments', sentApartments);  // Store the updated list in flow context\n\n    // Set the formatted messages as the payload to send to Telegram\n    msg.payload = formattedMessages;\n} else {\n    msg.payload = \"No new apartments to send.\";\n}\n\nreturn msg;\n\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 320,
+        "y": 660,
+        "wires": [
+            [
+                "c8bf7d979e9a1b34",
+                "9e7247b8197f2e66",
+                "2603995721fca7e7"
+            ]
+        ]
+    },
+    {
+        "id": "ecfbf8b267fc9496",
+        "type": "function",
+        "z": "d0aa877c69268acf",
+        "name": "(group)",
+        "func": "// Get the list of previously sent apartment links from flow context\nlet sentApartments = flow.get('sentApartments') || [];\n\n// Initialize an array to store the formatted messages\nlet formattedMessages = [];\n\n// Initialize an array to store the links of new apartments\nlet newApartments = [];\n\n// Iterate over each apartment in the combined data\nmsg.payload.forEach(apartment => {\n    let apartmentDetails = apartment.apartmentDetails;\n    let link = apartment.link;\n\n    // Check if the apartment has been sent before (based on its link)\n    if (!sentApartments.includes(link)) {\n        // If not sent before, mark it as new and add it to newApartments\n        newApartments.push(link);\n\n        // Extract the address (the part after the \"|\")\n        let parts = apartmentDetails.split('|');\n        let address = parts.length > 1 ? parts[1].trim() : \"Unknown location\"; // Get the address after the \"|\"\n\n        // Create a Google Maps link based on the address\n        let googleMapsLink = `https://www.google.com/maps?q=${encodeURIComponent(address)}`;\n\n        // Format the message for Telegram\n        let message = `Apartment Details: ${apartmentDetails}\\n\\n` +\n            `More Info: [Click here](${link})\\n` + // The apartment link\n            `View on Google Maps: [Google Maps](${googleMapsLink})`; // Google Maps link\n\n        // Add the formatted message to the array\n        formattedMessages.push({\n            chatId: \"-1002546713175\",  // Replace with your actual Telegram chat ID\n            type: \"message\",\n            content: message,\n            options: {\n                parse_mode: \"Markdown\"\n            }\n        });\n    }\n});\n\n// If there are any new apartments, proceed with sending them to Telegram\nif (formattedMessages.length > 0) {\n    // Update the list of sent apartments by adding the new apartments\n    sentApartments = [...sentApartments, ...newApartments];\n    flow.set('sentApartments', sentApartments);  // Store the updated list in flow context\n\n    // Set the formatted messages as the payload to send to Telegram\n    msg.payload = formattedMessages;\n} else {\n    msg.payload = \"No new apartments to send.\";\n}\n\nreturn msg;\n\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 280,
+        "y": 720,
+        "wires": [
+            [
+                "9e7247b8197f2e66",
+                "1b1e2459e5614fd9"
+            ]
+        ]
+    },
+    {
+        "id": "0e7b3b71b7f2042f",
+        "type": "telegram sender",
+        "z": "d0aa877c69268acf",
+        "name": "Sender node",
+        "bot": "8de2ee7b9a7ab0c8",
+        "haserroroutput": true,
+        "outputs": 2,
+        "x": 915,
+        "y": 660,
+        "wires": [
+            [
+                "34e5b885f1409ad3"
+            ],
+            []
+        ],
+        "l": false
+    },
+    {
+        "id": "a9fe3ae2055693a9",
+        "type": "function",
+        "z": "d0aa877c69268acf",
+        "name": "Combine data",
+        "func": "let apartmentDetails = msg.payload.details || []; // AD data from the Apart Details node\nlet links = msg.payload.links || []; // LE data from the Links Extraction node\n\n// Debug the apartmentDetails and links arrays before combining\nnode.warn(\"Apartment Details: \" + JSON.stringify(apartmentDetails));\nnode.warn(\"Links: \" + JSON.stringify(links));\n\n// Combine the arrays into an array of objects without length checking\nlet combinedData = apartmentDetails.map((detail, index) => ({\n    apartmentDetails: detail,\n    link: links[index] || \"\" // If there's no link, use an empty string\n}));\n\n// Set the combined data to the message payload\nmsg.payload = combinedData;\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1010,
+        "y": 420,
+        "wires": [
+            [
+                "a78f54db46bd24e0",
+                "ecfbf8b267fc9496",
+                "d105c98604d053a7"
+            ]
+        ]
+    },
+    {
+        "id": "c8bf7d979e9a1b34",
+        "type": "debug",
+        "z": "d0aa877c69268acf",
+        "name": "debug TELEMSG",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 550,
+        "y": 600,
+        "wires": []
+    },
+    {
+        "id": "e70cf8870352a304",
+        "type": "inject",
+        "z": "d0aa877c69268acf",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "{\"chatId\":\"-1002546713175\",\"type\":\"message\",\"content\":\"I WILL MURDER SILVIA\",\"options\":{\"parse_mode\":\"Markdown\"}}",
+        "payloadType": "json",
+        "x": 790,
+        "y": 760,
+        "wires": [
+            [
+                "0e7b3b71b7f2042f"
+            ]
+        ]
+    },
+    {
+        "id": "34e5b885f1409ad3",
+        "type": "debug",
+        "z": "d0aa877c69268acf",
+        "name": "TELEGRAM",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1110,
+        "y": 600,
+        "wires": []
+    },
+    {
+        "id": "2b5cb2969cbd015f",
+        "type": "join",
+        "z": "d0aa877c69268acf",
+        "name": "",
+        "mode": "custom",
+        "build": "object",
+        "property": "payload",
+        "propertyType": "msg",
+        "key": "topic",
+        "joiner": "\\n",
+        "joinerType": "str",
+        "accumulate": false,
+        "timeout": "",
+        "count": "2",
+        "reduceRight": false,
+        "reduceExp": "",
+        "reduceInit": "",
+        "reduceInitType": "",
+        "reduceFixup": "",
+        "x": 830,
+        "y": 380,
+        "wires": [
+            [
+                "a9fe3ae2055693a9"
+            ]
+        ]
+    },
+    {
+        "id": "a78f54db46bd24e0",
+        "type": "debug",
+        "z": "d0aa877c69268acf",
+        "name": "COMBINE",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1100,
+        "y": 280,
+        "wires": []
+    },
+    {
+        "id": "8df5cd8e199452df",
+        "type": "function",
+        "z": "d0aa877c69268acf",
+        "name": "Assigning payload.links",
+        "func": "// Assuming msg.payload contains the extracted links (relative URLs) after the \"Links Extraction\" node\nlet links = msg.payload || []; // Links extracted from the Links Extraction node\n\n// Move the links to msg.payload.links for consistency\nmsg.payload.links = links;\n\nmsg.topic = \"links\"\nreturn msg;\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 770,
+        "y": 340,
+        "wires": [
+            [
+                "82fe7d310caba5da",
+                "2b5cb2969cbd015f"
+            ]
+        ]
+    },
+    {
+        "id": "b51ae58ec3ecf31b",
+        "type": "function",
+        "z": "d0aa877c69268acf",
+        "name": "Assigning payload.details",
+        "func": "// Assuming msg.payload contains the extracted apartment details from the \"Apart Details\" node\nlet details = msg.payload || []; // Details extracted from the Apart Details node\n\n// Move the details to msg.payload.details for consistency\nmsg.payload.details = details;\n\nmsg.topic = \"details\"\nreturn msg;\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 550,
+        "y": 440,
+        "wires": [
+            [
+                "2b5cb2969cbd015f"
+            ]
+        ]
+    },
+    {
+        "id": "146765422d35e6fe",
+        "type": "function",
+        "z": "d0aa877c69268acf",
+        "name": "Links cleaning",
+        "func": "let baseURL = \"https://inberlinwohnen.de\"; // Base URL for relative links\n\n// Retrieve links and details from msg.payload\nlet links = msg.payload || [];  // Links extracted from the links node\n\n// Extract href attribute from each link object and prepend baseURL\nlet extractedLinks = links.map(linkObj => {\n    let href = linkObj.href || \"\";  // Default to empty string if 'href' is not available\n    return baseURL + href;  // Combine baseURL with the href\n});\n\n// Set the final array of full URLs as the message payload\nmsg.payload = extractedLinks;\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 520,
+        "y": 340,
+        "wires": [
+            [
+                "f758067ba03a773f",
+                "8df5cd8e199452df"
+            ]
+        ]
+    },
+    {
+        "id": "82fe7d310caba5da",
+        "type": "debug",
+        "z": "d0aa877c69268acf",
+        "name": "debug 2",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 890,
+        "y": 200,
+        "wires": []
+    },
+    {
+        "id": "5aa6e0e3fec00bce",
+        "type": "html",
+        "z": "d0aa877c69268acf",
+        "name": "Apart details",
+        "property": "payload",
+        "outproperty": "payload",
+        "tag": "span._tb_left",
+        "ret": "text",
+        "as": "single",
+        "chr": "",
+        "x": 270,
+        "y": 440,
+        "wires": [
+            [
+                "645686cd74a65ca2",
+                "b51ae58ec3ecf31b"
+            ]
+        ]
+    },
+    {
+        "id": "ea9ae61a70074cfe",
+        "type": "html",
+        "z": "d0aa877c69268acf",
+        "name": "Links Extraction",
+        "property": "payload",
+        "outproperty": "payload",
+        "tag": "a.org-but",
+        "ret": "attr",
+        "as": "single",
+        "chr": "",
+        "x": 280,
+        "y": 360,
+        "wires": [
+            [
+                "92e102b999c94c1f",
+                "146765422d35e6fe"
+            ]
+        ]
+    },
+    {
+        "id": "f758067ba03a773f",
+        "type": "debug",
+        "z": "d0aa877c69268acf",
+        "name": "CLEAN LINKS",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 720,
+        "y": 280,
+        "wires": []
+    },
+    {
+        "id": "a0e3b01f1caef6e2",
+        "type": "http request",
+        "z": "d0aa877c69268acf",
+        "name": "",
+        "method": "GET",
+        "ret": "txt",
+        "paytoqs": "ignore",
+        "url": "https://inberlinwohnen.de/wohnungsfinder/",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "insecureHTTPParser": false,
+        "authType": "",
+        "senderr": false,
+        "headers": [],
+        "x": 270,
+        "y": 280,
+        "wires": [
+            [
+                "33aa046a936116c8",
+                "ea9ae61a70074cfe",
+                "5aa6e0e3fec00bce"
+            ]
+        ]
+    },
+    {
+        "id": "645686cd74a65ca2",
+        "type": "debug",
+        "z": "d0aa877c69268acf",
+        "name": "DETAILS",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 520,
+        "y": 520,
+        "wires": []
+    },
+    {
+        "id": "92e102b999c94c1f",
+        "type": "debug",
+        "z": "d0aa877c69268acf",
+        "name": "LINKS",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 530,
+        "y": 280,
+        "wires": []
+    },
+    {
+        "id": "f5926c4e571266dc",
+        "type": "inject",
+        "z": "d0aa877c69268acf",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "300",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 210,
+        "y": 160,
+        "wires": [
+            [
+                "a0e3b01f1caef6e2"
+            ]
+        ]
+    },
+    {
+        "id": "33aa046a936116c8",
+        "type": "debug",
+        "z": "d0aa877c69268acf",
+        "name": "request",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 400,
+        "y": 200,
+        "wires": []
+    },
+    {
+        "id": "2603995721fca7e7",
+        "type": "function",
+        "z": "d0aa877c69268acf",
+        "name": "Catch empty msgs (no new listings)",
+        "func": "// Check if there is anything to send\nif (msg.payload === \"No new apartments to send.\" ){\n    msg.payload = {\n        chatId: \"672048596\",  // Replace with your actual Telegram chat ID\n        type: \"message\",\n        content: \"No new listings in the last 5 minutes\",\n        options: {\n            parse_mode: \"Markdown\"\n        }\n    };\n}\n\nreturn msg;\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 560,
+        "y": 820,
+        "wires": [
+            [
+                "0e7b3b71b7f2042f"
+            ]
+        ]
+    },
+    {
+        "id": "24a951cad96814cf",
+        "type": "telegram receiver",
+        "z": "d0aa877c69268acf",
+        "name": "",
+        "bot": "8de2ee7b9a7ab0c8",
+        "saveDataDir": "",
+        "filterCommands": false,
+        "x": 150,
+        "y": 860,
+        "wires": [
+            [],
+            []
+        ]
+    },
+    {
+        "id": "6431c94aaab0a426",
+        "type": "telegram sender",
+        "z": "d0aa877c69268acf",
+        "name": "",
+        "bot": "8de2ee7b9a7ab0c8",
+        "haserroroutput": false,
+        "outputs": 1,
+        "x": 990,
+        "y": 920,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "start_command",
+        "type": "telegram command",
+        "z": "d0aa877c69268acf",
+        "name": "Start Command",
+        "command": "/start",
+        "description": "",
+        "registercommand": false,
+        "language": "",
+        "bot": "8de2ee7b9a7ab0c8",
+        "strict": false,
+        "hasresponse": true,
+        "useregex": false,
+        "removeregexcommand": false,
+        "outputs": 2,
+        "x": 340,
+        "y": 920,
+        "wires": [
+            [
+                "welcome_function"
+            ],
+            []
+        ]
+    },
+    {
+        "id": "welcome_function",
+        "type": "function",
+        "z": "d0aa877c69268acf",
+        "name": "Welcome + Location",
+        "func": "msg.payload = {\n    chatId: msg.payload.chatId,\n    type: 'message',\n    content: `👋 Welcome to Mudanssa Bot!\\n\\nTo begin, click the *Location* button below to define in which city Mudanssa should focus its efforts.`,\n    options: {\n        parse_mode: \"Markdown\",\n        reply_markup: {\n            keyboard: [[{ text: \"Berlin\" }, { text: \"Other cities\" }]],\n            resize_keyboard: true,\n            one_time_keyboard: true\n        }\n    }\n};\nreturn msg;",
+        "outputs": 1,
+        "x": 580,
+        "y": 920,
+        "wires": [
+            [
+                "6431c94aaab0a426"
+            ]
+        ]
+    },
+    {
+        "id": "other_cities_command",
+        "type": "telegram command",
+        "z": "d0aa877c69268acf",
+        "name": "Other Cities Response",
+        "command": "Other cities",
+        "description": "",
+        "registercommand": false,
+        "language": "",
+        "bot": "8de2ee7b9a7ab0c8",
+        "strict": true,
+        "hasresponse": true,
+        "useregex": false,
+        "removeregexcommand": false,
+        "outputs": 2,
+        "x": 360,
+        "y": 1000,
+        "wires": [
+            [
+                "other_cities_fn"
+            ],
+            []
+        ]
+    },
+    {
+        "id": "other_cities_fn",
+        "type": "function",
+        "z": "d0aa877c69268acf",
+        "name": "Notify + Re-prompt Location",
+        "func": "const notSupportedMsg = {\n  chatId: msg.payload.chatId,\n  type: 'message',\n  content: '❗ Other cities are not supported in the current development stage.'\n};\nnode.send([notSupportedMsg, null]);\n\nconst rePromptMsg = {\n  chatId: msg.payload.chatId,\n  type: 'message',\n  content: `Please select your location again.`,\n  options: {\n    reply_markup: {\n      keyboard: [[{ text: \"Berlin\" }, { text: \"Other cities\" }]],\n      resize_keyboard: true,\n      one_time_keyboard: true\n    }\n  }\n};\nnode.send([null, rePromptMsg]);\nreturn null;",
+        "outputs": 2,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 600,
+        "y": 1000,
+        "wires": [
+            [
+                "6431c94aaab0a426"
+            ],
+            [
+                "6431c94aaab0a426"
+            ]
+        ]
+    },
+    {
+        "id": "location_input_command",
+        "type": "telegram command",
+        "z": "d0aa877c69268acf",
+        "name": "Location Input",
+        "command": "Berlin",
+        "description": "",
+        "registercommand": false,
+        "language": "",
+        "bot": "8de2ee7b9a7ab0c8",
+        "strict": true,
+        "hasresponse": true,
+        "useregex": false,
+        "removeregexcommand": false,
+        "outputs": 2,
+        "x": 330,
+        "y": 1080,
+        "wires": [
+            [
+                "confirm_berlin_function"
+            ],
+            []
+        ]
+    },
+    {
+        "id": "confirm_berlin_function",
+        "type": "function",
+        "z": "d0aa877c69268acf",
+        "name": "Confirm Berlin",
+        "func": "msg.payload = {\n    chatId: msg.payload.chatId,\n    type: 'message',\n    content: `✅ Berlin selected!\\n\\nLet’s define your budget.`\n};\nreturn msg;",
+        "outputs": 1,
+        "x": 560,
+        "y": 1080,
+        "wires": [
+            [
+                "ask_min_price"
+            ]
+        ]
+    },
+    {
+        "id": "ask_min_price",
+        "type": "function",
+        "z": "d0aa877c69268acf",
+        "name": "Ask Min Price",
+        "func": "// Save state\nflow.set(msg.payload.chatId + '_awaiting', 'min');\nmsg.payload = {\n  chatId: msg.payload.chatId,\n  type: 'message',\n  content: '💬 What is your *minimum price* in €?',\n  options: { parse_mode: \"Markdown\" }\n};\nreturn msg;",
+        "outputs": 1,
+        "x": 780,
+        "y": 1080,
+        "wires": [
+            [
+                "6431c94aaab0a426"
+            ]
+        ]
+    },
+    {
+        "id": "catch_message",
+        "type": "telegram receiver",
+        "z": "d0aa877c69268acf",
+        "name": "Catch Text Responses",
+        "bot": "8de2ee7b9a7ab0c8",
+        "saveDataDir": "",
+        "filterCommands": false,
+        "x": 360,
+        "y": 1160,
+        "wires": [
+            [
+                "handle_price_input",
+                "f3076787fab18a68"
+            ],
+            [
+                "handle_price_input",
+                "f3076787fab18a68"
+            ]
+        ]
+    },
+    {
+        "id": "handle_price_input",
+        "type": "function",
+        "z": "d0aa877c69268acf",
+        "name": "Handle Price Input",
+        "func": "const chatId = msg.payload.chatId || (msg.payload.chat && msg.payload.chat.id);\nconst content = msg.payload.content?.trim();\nconst state = flow.get(chatId + '_awaiting');\n\n// 🛑 If no state is set, ignore the message completely\nif (!state) {\n    return [null, null];\n}\n\n// Basic validation: check if content is a number\nconst userInput = parseInt(content, 10);\nif (isNaN(userInput)) {\n    return [{\n        payload: {\n            chatId,\n            type: 'message',\n            content: \"❗ Please enter a valid number (e.g., 400).\"\n        }\n    }, null];\n}\n\nif (state === 'min') {\n    flow.set(chatId + '_minPrice', userInput);\n    flow.set(chatId + '_awaiting', 'max');\n\n    return [{\n        payload: {\n            chatId,\n            type: 'message',\n            content: '💬 Now, what is your *maximum price* in €?',\n            options: { parse_mode: \"Markdown\" }\n        }\n    }, null];\n\n} else if (state === 'max') {\n    flow.set(chatId + '_maxPrice', userInput);\n    flow.set(chatId + '_awaiting', null);\n\n    const confirmationMsg = {\n        payload: {\n            chatId,\n            type: 'message',\n            content: `✅ Your preferences have been saved!\\nWe'll start sending you personalized apartment listings shortly.`,\n            options: { parse_mode: \"Markdown\" }\n        }\n    };\n\n    const logTriggerMsg = {\n        payload: {\n            chatId\n        }\n    };\n\n    return [confirmationMsg, logTriggerMsg];\n}\n\nreturn [null, null];\n",
+        "outputs": 2,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 620,
+        "y": 1160,
+        "wires": [
+            [
+                "6431c94aaab0a426",
+                "4148628eb669f181"
+            ],
+            [
+                "8df19b0c68bf3d3e",
+                "03fc6e792c829ef4"
+            ]
+        ]
+    },
+    {
+        "id": "0c11d7d26a4c4521",
+        "type": "telegram event",
+        "z": "d0aa877c69268acf",
+        "name": "Callback: summary",
+        "bot": "8de2ee7b9a7ab0c8",
+        "event": "callback_query",
+        "autoanswer": false,
+        "x": 90,
+        "y": 980,
+        "wires": [
+            [
+                "d9798681e5410684"
+            ]
+        ]
+    },
+    {
+        "id": "529612589f04e373",
+        "type": "function",
+        "z": "d0aa877c69268acf",
+        "name": "Offer action/Add Reset/Summary",
+        "func": "msg.payload = {\n  chatId: msg.payload.chatId,\n  type: \"message\",\n  content: \"What would you like to do next?\",\n  options: {\n    reply_markup: {\n      inline_keyboard: [\n        [{ text: \"🔁 Start Over\", callback_data: \"start_over\" }],\n        [{ text: \"📋 Summary\", callback_data: \"summary\" }]\n      ]\n    }\n  }\n};\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 760,
+        "y": 1300,
+        "wires": [
+            [
+                "6431c94aaab0a426"
+            ]
+        ]
+    },
+    {
+        "id": "2593a308174a5cce",
+        "type": "function",
+        "z": "d0aa877c69268acf",
+        "name": "Clear State/Start over",
+        "func": "const chatId = msg.payload.chatId;\nflow.set(chatId + \"_awaiting\", null);\nflow.set(chatId + \"_minPrice\", null);\nflow.set(chatId + \"_maxPrice\", null);\n\nmsg.payload = {\n  chatId,\n  type: \"message\",\n  content: \"🔁 Starting over...\",\n};\n\nreturn msg;\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 360,
+        "y": 960,
+        "wires": [
+            [
+                "welcome_function"
+            ]
+        ]
+    },
+    {
+        "id": "8df19b0c68bf3d3e",
+        "type": "function",
+        "z": "d0aa877c69268acf",
+        "name": "Prepare user log",
+        "func": "const chatId = msg.payload.chatId;\nconst min = flow.get(chatId + \"_minPrice\");\nconst max = flow.get(chatId + \"_maxPrice\");\n\nmsg.filename = `/home/alex/UE-Germany/Agile_Project_2ndSemester/HomeSearch_Node-Red/user_${chatId}.json`;\nmsg.payload = JSON.stringify({\n  chatId,\n  location: \"Berlin\",\n  minPrice: min,\n  maxPrice: max,\n  timestamp: new Date().toISOString()\n}) + \"\\n\";\n\nreturn msg;\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 320,
+        "y": 1340,
+        "wires": [
+            [
+                "1e11f260d97cb415"
+            ]
+        ]
+    },
+    {
+        "id": "1e11f260d97cb415",
+        "type": "file",
+        "z": "d0aa877c69268acf",
+        "name": "",
+        "filename": "filename",
+        "filenameType": "msg",
+        "appendNewline": false,
+        "createDir": false,
+        "overwriteFile": "false",
+        "encoding": "none",
+        "x": 480,
+        "y": 1340,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "819cd2790b8a8643",
+        "type": "telegram event",
+        "z": "d0aa877c69268acf",
+        "name": "Callback: start_over",
+        "bot": "8de2ee7b9a7ab0c8",
+        "event": "callback_query",
+        "autoanswer": false,
+        "x": 110,
+        "y": 1060,
+        "wires": [
+            [
+                "2593a308174a5cce"
+            ]
+        ]
+    },
+    {
+        "id": "d9798681e5410684",
+        "type": "function",
+        "z": "d0aa877c69268acf",
+        "name": "Summary generator",
+        "func": "const chatId = msg.payload.chat.id;\nconst min = flow.get(chatId + '_minPrice') || 'not set';\nconst max = flow.get(chatId + '_maxPrice') || 'not set';\n\nmsg.payload = {\n    chatId: chatId,\n    type: 'message',\n    content: `📋 *Your Selections:*\\n- Location: *Berlin*\\n- Min: *€${min}*\\n- Max: *€${max}*`,\n    options: {\n        parse_mode: \"Markdown\"\n    }\n};\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 360,
+        "y": 880,
+        "wires": [
+            [
+                "6431c94aaab0a426"
+            ]
+        ]
+    },
+    {
+        "id": "03fc6e792c829ef4",
+        "type": "debug",
+        "z": "d0aa877c69268acf",
+        "name": "debug 1",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 820,
+        "y": 1220,
+        "wires": []
+    },
+    {
+        "id": "4148628eb669f181",
+        "type": "debug",
+        "z": "d0aa877c69268acf",
+        "name": "debug 3",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 820,
+        "y": 1160,
+        "wires": []
+    },
+    {
+        "id": "f3076787fab18a68",
+        "type": "debug",
+        "z": "d0aa877c69268acf",
+        "name": "debug 4",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 490,
+        "y": 1120,
+        "wires": []
+    },
+    {
+        "id": "1b1e2459e5614fd9",
+        "type": "function",
+        "z": "d0aa877c69268acf",
+        "name": "Catch empty msgs (group)",
+        "func": "if (msg.payload === \"No new apartments to send.\") {\n    msg.payload = {\n        chatId: \"-1002546713175\",  // your group chat ID\n        type: \"message\",\n        content: \"No new listings in the last 5 minutes\",\n        options: {\n            parse_mode: \"Markdown\"\n        }\n    };\n}\nreturn msg;\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 570,
+        "y": 740,
+        "wires": [
+            []
+        ]
+    }
+]
