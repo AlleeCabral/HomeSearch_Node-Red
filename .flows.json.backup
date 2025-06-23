@@ -1109,15 +1109,5 @@
                 "91a0684346ff1fe0"
             ]
         ]
-    },
-    {
-        "id": "513b905f65732825",
-        "type": "comment",
-        "z": "d0aa877c69268acf",
-        "name": "TO DO",
-        "info": "when reset, works fine with last 10 listsings logic\nafter 5 minutes, initialrequest turns false and all listings asre sent again",
-        "x": 1570,
-        "y": 900,
-        "wires": []
     }
 ]
